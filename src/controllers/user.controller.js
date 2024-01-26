@@ -25,7 +25,12 @@ const registerUser=asyncHandler(async (req,res)=>{
 
 const avatarLocalPath= req.files?.avatar[0]?.path;
 console.log(req.files);
-const coverImageLocalPath=req.files?.coverImage[0]?.path;
+// const coverImageLocalPath=req.files?.coverImage[0]?.path;
+
+let coverImageLocalPath;
+if(req.files && req.files.coverImage.length>0 && Array.isArray(req.files.coverImage)){
+    coverImageLocalPath=req.files.coverImage[0].path
+}
 if(!avatarLocalPath){
     throw new ApiError(400,"Avatar required")
 }
@@ -44,7 +49,7 @@ const user=await User.create({
     password,
     username:username.toLowerCase()
 })
-const createUser=await User.findById(user._id).select(
+const createdUser=await User.findById(user._id).select(
     "-password -refreshToken"
 )
 if(!createdUser){
@@ -52,7 +57,7 @@ if(!createdUser){
 }
 
 return res.status(201).json(
-    new ApiResponse(200,createduser,"User registered successfully")
+    new ApiResponse(200,createdUser,"User registered successfully")
 )
 })
 
